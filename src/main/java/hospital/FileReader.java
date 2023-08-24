@@ -13,20 +13,53 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class FileReader {
 
+    private final String adress;
+    private final String excelName;
+    private final String sheetName;
+    private final String newExcelName;
+    private final int days;
+    private int columnNum;
+
+    public FileReader(String adress, String excelName, String sheetName, int days) {
+        this.adress = adress;
+        this.excelName = excelName;
+        this.sheetName = sheetName;
+        this.newExcelName = excelName+" yeni";
+        this.days = days;
+    }
+    public FileReader(String adress, String excelName, String sheetName, int days, String newExcelName) {
+        this.adress = adress;
+        this.excelName = excelName;
+        this.sheetName = sheetName;
+        this.newExcelName = newExcelName;
+        this.days = days;
+    }
 
     List<Cell> availableCells = new ArrayList<>();
     List<Integer> unavailableDoctors = new ArrayList<>();
     List<Integer> offDoctors = new ArrayList<>();
     List<Integer> watchingDoctors = new ArrayList<>();
     public void readFile()throws IOException {
+        CheckDays(days);
         //obtaining input bytes from a file
-        File file = new File("C:\\Users\\nuhyi\\OneDrive\\Masaüstü\\Nöbet\\nöbet.xlsx");   //creating a new file instance
+        File file = new File(adress+"\\"+excelName+".xlsx");   //creating a new file instance
         FileInputStream fis = new FileInputStream(file);   //obtaining bytes from the file
         //creating Workbook instance that refers to .xlsx file
         XSSFWorkbook wb = new XSSFWorkbook(fis);
-        XSSFSheet sheet = wb.getSheet("EYLÜL 2023");     //creating a Sheet object to retrieve object
+        XSSFSheet sheet = wb.getSheet(sheetName);     //creating a Sheet object to retrieve object
         FormulaEvaluator formulaEvaluator=wb.getCreationHelper().createFormulaEvaluator();
-        for (int j = 3; j < 32; j++) {
+        checkFile(formulaEvaluator, sheet, wb);
+        fis.close();
+        FileOutputStream os = new FileOutputStream(adress+"\\"+newExcelName+".xlsx");
+        wb.write(os);
+        //Close the workbook and output stream
+        wb.close();
+        os.close();
+
+    }
+
+    private void checkFile(FormulaEvaluator formulaEvaluator, XSSFSheet sheet, XSSFWorkbook wb){
+        for (int j = 3; j < columnNum; j++) {
             for (int i = 14; i < 30; i++) {
                 Cell cell = sheet.getRow(i).getCell(j);
                 if (formulaEvaluator.evaluateInCell(cell).getCellTypeEnum().equals(CellType.STRING)) {
@@ -40,13 +73,10 @@ public class FileReader {
             fillCells(availableCells, wb);
             resetLists(availableCells, unavailableDoctors, offDoctors, watchingDoctors);
         }
-        fis.close();
-        FileOutputStream os = new FileOutputStream("C:\\Users\\nuhyi\\OneDrive\\Masaüstü\\Nöbet\\nöbettest.xlsx");
-        wb.write(os);
-        //Close the workbook and output stream
-        wb.close();
-        os.close();
+    }
 
+    private void CheckDays(int days){
+        columnNum = days+2;
     }
 
     private void fillCells(List<Cell> cellList, XSSFWorkbook wb)
@@ -110,6 +140,10 @@ public class FileReader {
         {
             list.clear();
         }
+    }
+
+    public int getDays() {
+        return days;
     }
 }
 

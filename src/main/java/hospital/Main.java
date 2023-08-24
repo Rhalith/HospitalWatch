@@ -2,11 +2,30 @@ package hospital;
 
 
 import java.io.IOException;
+import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws IOException {
-            FileReader fileReader = new FileReader();
 
-            fileReader.readFile();
+    public static void main(String[] args) throws IOException {
+
+        FileReader fileReader;
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Excel dosyasının bulunduğu klasör adresini gir.(Arama yerinin solundaki yere tıklayıp kopyala yapıştır)");
+        String adress = scanner.nextLine();
+        System.out.println("Excel Dosyasının adını gir.(f2'ye bas kopyala yapıştır)");
+        String excelName = scanner.nextLine();
+        System.out.println("Yeni oluşacak excel dosyasının adını gir.(Girmeyeceksen boş bırak)");
+        String newExcelName = scanner.nextLine();
+        System.out.println("Sayfa adını gir.(Örnek: EYLÜL 2023)");
+        String sheetName = scanner.nextLine();
+        System.out.println("Ayda kaç gün var?");
+        int days = scanner.nextInt();
+        if(newExcelName.isEmpty()){
+            fileReader = new FileReader(adress, excelName,sheetName, days);
+        }
+        else{
+            fileReader = new FileReader(adress, excelName,sheetName, days, newExcelName);
+        }
+        fileReader.readFile();
     }
 }
