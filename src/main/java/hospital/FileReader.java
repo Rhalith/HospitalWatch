@@ -19,6 +19,8 @@ public class FileReader {
     private final String newExcelName;
     private final int days;
     private int columnNum;
+    private boolean isPreviousClear = true;
+    private boolean isNextClear = true;
 
     public FileReader(String adress, String excelName, String sheetName, int days) {
         this.adress = adress;
@@ -62,16 +64,35 @@ public class FileReader {
         for (int j = 3; j < columnNum; j++) {
             for (int i = 14; i < 30; i++) {
                 Cell cell = sheet.getRow(i).getCell(j);
+                Cell previousCell = null;
+                Cell nextCell = null;
+                if(j != 3) {
+                    previousCell = sheet.getRow(i).getCell(j-1);
+                }
+                if(j != columnNum){
+                    nextCell = sheet.getRow(i).getCell(j+1);
+                }
                 if (formulaEvaluator.evaluateInCell(cell).getCellTypeEnum().equals(CellType.STRING)) {
                     checkCellString(cell, i);
                 } else if (formulaEvaluator.evaluateInCell(cell).getCellTypeEnum().equals(CellType.NUMERIC)) {
                     System.out.println("Numara olmaması gereken '" + cell.getAddress() + "' hücresinde numara var. Lütfen excel dosyasını düzelt.");
                 } else {
-                    availableCells.add(cell);
+                    if(previousCell != null && previousCell.getCellTypeEnum().equals(CellType.STRING)){
+                        if (previousCell.getStringCellValue().equals("N")) {
+                            isPreviousClear = false;
+                        }
+                    }
+                    if(nextCell != null && nextCell.getCellTypeEnum().equals(CellType.STRING)){
+                        if(nextCell.getStringCellValue().equals("N")){
+                            isNextClear = false;
+                        }
+                    }
+                    if(isPreviousClear && isNextClear) availableCells.add(cell);
+                    isPreviousClear = true; isNextClear = true;
                 }
             }
             fillCells(availableCells, wb);
-            resetLists(availableCells, unavailableDoctors, offDoctors, watchingDoctors);
+            resetLists(availableCells, offDoctors, watchingDoctors);
         }
     }
 
@@ -92,8 +113,7 @@ public class FileReader {
         while (4 > watchingDoctors.size()){
             int j = random.nextInt(0,cellList.size());
             if (!watchingDoctors.contains(j))
-                if (!unavailableDoctors.contains(j))
-                    if (!offDoctors.contains(j)) {
+                if (!offDoctors.contains(j)) {
                         cellList.get(j).setCellValue("N");
                         cellList.get(j).setCellStyle(cellStyle);
                         watchingDoctors.add(j);
@@ -107,7 +127,6 @@ public class FileReader {
         if(cell.getStringCellValue().equals("N"))
         {
             watchingDoctors.add(i);
-            unavailableDoctors.add(i);
         }
         else if (cell.getStringCellValue().equals("X")){
             offDoctors.add(i);

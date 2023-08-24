@@ -9,23 +9,28 @@ public class Main {
     public static void main(String[] args) throws IOException {
 
         FileReader fileReader;
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Excel dosyasının bulunduğu klasör adresini gir.(Arama yerinin solundaki yere tıklayıp kopyala yapıştır)");
-        String adress = scanner.nextLine();
-        System.out.println("Excel Dosyasının adını gir.(f2'ye bas kopyala yapıştır)");
-        String excelName = scanner.nextLine();
-        System.out.println("Yeni oluşacak excel dosyasının adını gir.(Girmeyeceksen boş bırak)");
-        String newExcelName = scanner.nextLine();
-        System.out.println("Sayfa adını gir.(Örnek: EYLÜL 2023)");
-        String sheetName = scanner.nextLine();
-        System.out.println("Ayda kaç gün var?");
-        int days = scanner.nextInt();
-        if(newExcelName.isEmpty()){
-            fileReader = new FileReader(adress, excelName,sheetName, days);
-        }
-        else{
-            fileReader = new FileReader(adress, excelName,sheetName, days, newExcelName);
-        }
+//        Scanner scanner = new Scanner(System.in);
+//        System.out.println("Excel dosyasının bulunduğu klasör adresini gir.(Arama yerinin solundaki yere tıklayıp kopyala yapıştır)");
+//        String adress = scanner.nextLine();
+//        System.out.println("Excel Dosyasının adını gir.(f2'ye bas kopyala yapıştır)");
+//        String excelName = scanner.nextLine();
+//        System.out.println("Yeni oluşacak excel dosyasının adını gir.(Girmeyeceksen boş bırak)");
+//        String newExcelName = scanner.nextLine();
+//        System.out.println("Sayfa adını gir.(Örnek: EYLÜL 2023)");
+//        String sheetName = scanner.nextLine();
+//        System.out.println("Ayda kaç gün var?");
+//        int days = scanner.nextInt();
+        String adress = "C:\\Users\\nuhyi\\OneDrive\\Masaüstü\\Nöbet";
+        String excelName = "nöbet";
+        String sheetName = "EYLÜL 2023";
+        int days = 31;
+        fileReader = new FileReader(adress, excelName,sheetName, days);
+//        if(newExcelName.isEmpty()){
+//            fileReader = new FileReader(adress, excelName,sheetName, days);
+//        }
+//        else{
+//            fileReader = new FileReader(adress, excelName,sheetName, days, newExcelName);
+//        }
         fileReader.readFile();
     }
 }
