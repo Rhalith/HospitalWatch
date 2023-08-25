@@ -2,6 +2,8 @@ package hospital;
 
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 public class Main {
@@ -24,7 +26,10 @@ public class Main {
         String excelName = "nöbet";
         String sheetName = "EYLÜL 2023";
         int days = 31;
-        fileReader = new FileReader(adress, excelName,sheetName, days);
+        List<Integer> skippingIndexes = new ArrayList<>();
+        skippingIndexes.add(26);
+        skippingIndexes.add(17);
+        fileReader = new FileReader(adress, excelName,sheetName, days, skippingIndexes);
 //        if(newExcelName.isEmpty()){
 //            fileReader = new FileReader(adress, excelName,sheetName, days);
 //        }

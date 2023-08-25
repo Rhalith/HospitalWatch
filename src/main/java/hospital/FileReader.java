@@ -21,20 +21,23 @@ public class FileReader {
     private int columnNum;
     private boolean isPreviousClear = true;
     private boolean isNextClear = true;
+    List<Integer> skippingIndexes;
 
-    public FileReader(String adress, String excelName, String sheetName, int days) {
+    public FileReader(String adress, String excelName, String sheetName, int days, List<Integer> skippingIndexes) {
         this.adress = adress;
         this.excelName = excelName;
         this.sheetName = sheetName;
         this.newExcelName = excelName+" yeni";
         this.days = days;
+        this.skippingIndexes = skippingIndexes;
     }
-    public FileReader(String adress, String excelName, String sheetName, int days, String newExcelName) {
+    public FileReader(String adress, String excelName, String sheetName, int days, List<Integer> skippingIndexes, String newExcelName) {
         this.adress = adress;
         this.excelName = excelName;
         this.sheetName = sheetName;
         this.newExcelName = newExcelName;
         this.days = days;
+        this.skippingIndexes = skippingIndexes;
     }
 
     List<Cell> availableCells = new ArrayList<>();
@@ -63,6 +66,7 @@ public class FileReader {
     private void checkFile(FormulaEvaluator formulaEvaluator, XSSFSheet sheet, XSSFWorkbook wb){
         for (int j = 3; j < columnNum; j++) {
             for (int i = 14; i < 30; i++) {
+                if(skippingIndexes.contains(i)) continue;
                 Cell cell = sheet.getRow(i).getCell(j);
                 Cell previousCell = null;
                 Cell nextCell = null;
