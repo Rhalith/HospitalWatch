@@ -25,6 +25,7 @@ public class FileReader {
     private int zortCount;
     List<Integer> skippingIndexes;
     List<Integer> filledRows = new ArrayList<>();
+    List<Integer> unFillableRows = new ArrayList<>();
 
     public FileReader(String adress, String excelName, String sheetName, int days, List<Integer> skippingIndexes) {
         this.adress = adress;
@@ -60,6 +61,9 @@ public class FileReader {
         FormulaEvaluator formulaEvaluator=wb.getCreationHelper().createFormulaEvaluator();
         //checkFile(formulaEvaluator, sheet, wb);
         checkAvailableCells(formulaEvaluator, sheet, wb, random);
+        while (!checkCreatedExcelFile(formulaEvaluator, sheet)){
+            checkAvailableCells(formulaEvaluator, sheet, wb, random);
+        }
         fis.close();
         FileOutputStream os = new FileOutputStream(adress+"\\"+newExcelName+".xlsx");
         wb.write(os);
@@ -80,6 +84,10 @@ public class FileReader {
             int nNum = 4;
             int nCount = 0;
             for (int j = 14; j < 30; j++) {
+                int emptycount = countEmptyCells(formulaEvaluator, j, sheet);
+                if(emptycount < 7){
+                    unFillableRows.add(j);
+                }
                 Cell cell = sheet.getRow(j).getCell(i);
                 if(checkCellHasN(formulaEvaluator, cell)){
                     nCount++;
@@ -100,8 +108,20 @@ public class FileReader {
                 }
                 if(checkNeighbourCells(previousCell, nextCell) && checkCellAvailability(formulaEvaluator, cell))
                 {
-                    fillCell(wb, cell);
-                    nCount++;
+                    int rowNCount = 0;
+                    for (int j = 3; j < days+2; j++) {
+                        Cell checkingCell = sheet.getRow(rowNum).getCell(j);
+                        if(checkCellHasN(formulaEvaluator, checkingCell)){
+                            rowNCount++;
+                        }
+                    }
+                    if(rowNCount < 11){
+                        fillCell(wb, cell);
+                        nCount++;
+                    }
+                    else {
+                        rowNum = random.nextInt(14,30);
+                    }
                 }
                 else {
                     rowNum = random.nextInt(14,30);
@@ -109,9 +129,29 @@ public class FileReader {
             }
             filledRows.add(rowNum);
             System.out.println(rowNum);
-            }
-            filledRows.clear();
+        }
+        filledRows.clear();
+    }
 
+    private boolean checkCreatedExcelFile(FormulaEvaluator formulaEvaluator, XSSFSheet sheet) {
+        int count = 0;
+        for (int i = 14; i < 30; i++) {
+            if(skippingIndexes.contains(i) || unFillableRows.contains(i)){
+                count++;
+                continue;
+            }
+            int nCount = 0;
+            for (int j = 3; j < days+2; j++) {
+                Cell checkingCell = sheet.getRow(i).getCell(j);
+                if(checkCellHasN(formulaEvaluator, checkingCell)){
+                    nCount++;
+                }
+            }
+            if(nCount > 7 && nCount < 12){
+                count++;
+            }
+        }
+        return count > 14;
     }
 
     private boolean checkNeighbourCells(Cell previousCell, Cell nextCell) {
@@ -153,15 +193,15 @@ public class FileReader {
         return nCount != 4;
     }
 
-    private int countEmptyCells(FormulaEvaluator formulaEvaluator, int columnNum, int rowNum, Sheet sheet){
+    private int countEmptyCells(FormulaEvaluator formulaEvaluator, int rowNum, Sheet sheet){
         int emptyCount = 0;
         Cell previousCell = null;
         Cell nextCell = null;
 
-        if(columnNum != 3) previousCell = sheet.getRow(rowNum).getCell(columnNum-1);
-        if(columnNum != 32) nextCell = sheet.getRow(rowNum).getCell(columnNum+1);
-        for (int i = 0; i < columnNum; i++) {
-            Cell cell = sheet.getRow(rowNum).getCell(columnNum);
+        for (int i = 3; i < days+2; i++) {
+            if(i != 3) previousCell = sheet.getRow(rowNum).getCell(i-1);
+            if(i != 32) nextCell = sheet.getRow(rowNum).getCell(i+1);
+            Cell cell = sheet.getRow(rowNum).getCell(i);
             if(!checkNeighbourCells(previousCell, nextCell) && !checkCellAvailability(formulaEvaluator, cell)) emptyCount++;
         }
         return emptyCount;
