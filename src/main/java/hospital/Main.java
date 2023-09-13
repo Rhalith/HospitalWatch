@@ -25,10 +25,11 @@ public class Main {
         String adress = "C:\\Users\\nuhyi\\OneDrive\\Masaüstü\\Nöbet";
         String excelName = "nöbet";
         String sheetName = "EYLÜL 2023";
-        int days = 31;
+        int days = 30;
         List<Integer> skippingIndexes = new ArrayList<>();
         skippingIndexes.add(26);
         skippingIndexes.add(17);
+        skippingIndexes.add(29);
         fileReader = new FileReader(adress, excelName,sheetName, days, skippingIndexes);
 //        if(newExcelName.isEmpty()){
 //            fileReader = new FileReader(adress, excelName,sheetName, days);
